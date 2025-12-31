@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
+import os
 from datetime import timedelta
 from pathlib import Path
 from celery.schedules import crontab
@@ -21,12 +22,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-u$!9bgcp9znoamf*2d*&=scn)0do(+s*lso7$#_zp870$a22%&'
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(os.environ.get("DEBUG", default=0))
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(",")
 
 
 # Application definition
@@ -97,11 +98,11 @@ DATABASES = {
 
     "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": "social_media_test",
-            "USER": "test",
-            "PASSWORD": "1234",
-            "HOST": "127.0.0.1",
-            "PORT": "5432",
+            "NAME": os.getenv('POSTGRES_DB', 'social_media_test'),
+            "USER": os.getenv('POSTGRES_USERNAME', 'test'),
+            "PASSWORD": os.getenv('POSTGRES_PASSWORD', '1234'),
+            "HOST": os.getenv('POSTGRES_HOST', '127.0.0.1'),
+            "PORT": os.getenv('POSTGRES_PORT', '5432'),
         }
 }
 
@@ -213,10 +214,9 @@ SIMPLE_JWT = {
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 
-CELERY_BROKER_URL = 'amqp://localhost:5672'
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'amqp://localhost:5672')
 # CELERY_BROKER_URL = 'redis://localhost:6379'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379'
-
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://localhost:6379')
 CELERY_BEAT_SCHEDULE = {
     'profile-count-every-minute' : {
         'task' : 'users.tasks.profile_count',

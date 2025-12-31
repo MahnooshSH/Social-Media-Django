@@ -1,0 +1,17 @@
+
+.idea/
+
+.env
+.venv
+env/
+venv/
+ENV/
+VENV/
+
+upload_files/
+
+celerybeat-schedule/
+db.sqlite3/
+
+.git/
+.gitignore
